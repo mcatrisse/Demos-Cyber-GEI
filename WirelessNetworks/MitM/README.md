@@ -26,7 +26,7 @@ sudo bettercap --iface wlan0
 
 ![](./img/scan_cap.png)
 
-3. We found our target! `192.168.254.102`, now we will perform an ARP Spoofing, but before we need to configure Kali VM to forward requests to the gateway comming from our target. Otherwise, our victim will lack from internet connectivity
+3. We found our target! `192.168.254.102`, now we will perform an ARP Spoofing, but before we need to configure Kali VM to forward requests to the gateway coming from our target. Otherwise, our victim will lack from internet connectivity
 
 > Run the following commands in a new shell
 
